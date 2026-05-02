@@ -413,6 +413,33 @@ public:
 
 
 
+    //----------------------------------------------------------------
+    // Funcion para medir tiempo de ejecucion
+    //----------------------------------------------------------------
+
+    template<typename Func> // CREA UNA FUNCION PLANTILLA (Servira para que nuestra funcion cronometro se vuelva universal)
+    // DATOS: * template (plantilla) es una forma de crear funciones/clases genericas
+    //        * typename indica que lo que viene después es un tipo de dato (aunque aún no sabemos cuaal)
+    //        * Func nos servilla para representar cualquier funcion que le pasemos luego a medirTIempo
+    //        * duration_cast convierte una durcion de un tipo a otro
+    //        * microseconds es una unidad de tiempo dentro de la libreria 1 segundo = 1,000,000 microsegundos
+    
+    double medirTiempo(Func funcion) { // Esta funcion/accion nos devolvera el tiempo que tarda otra funcion en ejecutarse en ms
+        // Datos: * auto deduce automáticamente el tipo de valor de esta variable (int, double, etc)
+        //        * 
+        auto inicio = chrono::high_resolution_clock::now(); // Captura el tiempo actual antes de ejecutar la funcion
+        funcion();                                          // Ejecuta la funcion que le pasemos
+        auto fin = chrono::high_resolution_clock::now();    // Toma el tiempo despues de ejecutar la funcion
+        
+        // Calcula en microsegundos la diferencia de tiempo entre que inicio y termino la tarea para saber su tiempo de ejecucion
+        auto duracion = chrono::duration_cast<chrono::microseconds>(fin - inicio); 
+        return duracion.count() / 1000.0; // Convertir a milisegundos (Por que esta en mc) y devolver
+    }
+};
+
+
+
+
 
 //----------------------------------------------------------------
 // Funcion principal
