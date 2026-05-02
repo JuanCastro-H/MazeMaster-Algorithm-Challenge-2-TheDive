@@ -375,6 +375,44 @@ public:
 
 
 
+    //----------------------------------------------------------------
+    // Obtener estadisticas del laberinto (muros, caminos y solucion)
+    //----------------------------------------------------------------
+    void mostrarEstadisticas() const {
+        int muros = 0, caminos = 0; // Crea los contadores de muros (#) y caminos (.)
+        
+        // Contar solo el area interna (sin bordes)
+        for (int i = 1; i < filas - 1; i++) {        // Bucle que recoore las filas internas del laberinto
+                                                     // i = 1 Empiezaa en la fila 1 (la fila 0 es el borde de arriba)
+                                                     // i < filas - 1 termina una fila antes del borde de abajo
+                                                     // i++ agrega o suma 1 en cada interaccion para recorrer la sigeunte fila
+            // Bucle que reccore las columnas
+            for (int j = 1; j < columnas - 1; j++) { // Misma anlogia que el anterior
+                if (laberinto[i][j] == '#') {        // Revisa si la celda actual en la que esta la columa es un muro
+                    muros++;                         // Si es un muro aumenta 1 el contador de muros
+                } else {                             // Sino es muro
+                    caminos++;                       // Aumenta 1 el contador de caminos
+                }
+            }
+        }
+        
+        // Calculaa el total de celdas internas (Excluyendo los bordes)
+        int areaTotal = (filas - 2) * (columnas - 2);
+        
+        // IMPRIME EN LA PANTALLA LOS MENSAJES CON LAS ESTADISTICAS
+        cout << ">> Estadisticas del Laberinto:" << endl; 
+        cout << "   Tamano: " << (filas-2) << "x" << (columnas-2) << " (" << areaTotal << " celdas)" << endl;
+        cout << "   Muros: " << muros << " (" << (muros * 100.0) / areaTotal << "%)" << endl;
+        cout << "   Caminos: " << caminos << " (" << (caminos * 100.0) / areaTotal << "%)" << endl;
+        
+        if (!solucion.empty()) { // Verifica si en la variable solucion hay datos que representen un camino y si es asi imprime el numero de celdas que recorre este
+            cout << "   Longitud de la solucion: " << solucion.size() << " pasos" << endl;
+        }
+        cout << endl; // Salto de linea
+    }
+
+
+
 
 //----------------------------------------------------------------
 // Funcion principal
