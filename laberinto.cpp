@@ -7,6 +7,7 @@
 // Le dice al programa cada vez que pida un martillo de la caja roja, no me hagas decir CajaRoja::Marillo. solo di martillo y me entiendes
 #include <chrono>     // Es Como un cronometro digital que puede medir el tiempo de manera ultra precisa milisegundos o menos
 #include <random>     // Es como una dado electronico, que sirve para obtener numeros aleatorios
+#include <stack>      // Acomoda los datos en una pila (tipo de platos) donde el ultimo en entrar es el primero en salir
 
 
 using namespace std; // Ahorra codigo y hace mas comodo la sintaxis en proyectos pequenhos
@@ -86,7 +87,7 @@ struct Punto { // Crea un molde para definir las posiciones con sus coordenadas 
 
 
 
-// CREACION VISUALIZACION Y RESOLUCION DEL LABERINTO
+// CREACION VISUALIZACION Y RESOLUCION DEL LABERINTO 
 
 
 class LaberintoMaestro { /*Este bloque define la clase LaberintoMaestro,
@@ -145,6 +146,99 @@ public:
         // Definir entrada y salida (considerando los bordes)
         entrada = Punto(1, 1);
         salida = Punto(filas - 2, columnas - 2);
+    }
+    
+
+    
+    //---------------------------------------------------------------------------
+    // Verificar si una coordenada esta dentro del laberinto (sin contar bordes)
+    //---------------------------------------------------------------------------
+
+    bool esValida(int x, int y) const {
+        return x >= 1 && x < filas - 1 && y >= 1 && y < columnas - 1;
+    } // Si "X" no esta en la primera y ultima fila, y "Y" no esta en la primera y ultima columna entonces es valido
+    
+
+
+    //--------------------------------------------------------------------------
+    // GENERADOR DEL LABERINTO QUE USA EL ALGORITMO DE BACKTRAKING (RETROCESO)
+    //--------------------------------------------------------------------------
+
+    // "Void" no devuelve nada la funcion
+    void generarLaberinto() { // "Cerebro constructor del laberito"
+
+        cout << ">> Generando laberinto..." << endl;
+        
+        // Stack para el algoritmo de backtracking
+        stack<Punto> pila; // Crea una pila de coordenadas
+        vector<vector<bool>> visitado(filas, vector<bool>(columnas, false));
+        // Crea una matriz llamada "visitado" que marca si cada celda del laberinto fue visitada o no (Todas inician en False)
+
+        
+        // Empezar desde la entrada
+        Punto actual = entrada;               // El punto de inicio es la entrda del laberintoq
+        laberinto[actual.x][actual.y] = ' ';  // Lo marca como camino libre " "
+        visitado[actual.x][actual.y] = true;  // Lo Marca como visitado con True
+        pila.push(actual);                    // Lo mete en la pila para empezar a explorar desde ahi
+        
+        // Bucle que va a recorrer los caminos hasta que se acaben
+        while (!pila.empty()) { // Mientras haya puntos/coordenadas en la pila seguimos explorando
+
+            actual = pila.top(); // El explorador mira donde esta actualmente
+            
+            //------------------------------------------------------------------
+            // Buscar vecinos no visitados (a distancia 2 para crear pasillos)
+            //------------------------------------------------------------------
+
+             // Crea una lista vacia llamada "vecinosLibres" para guardar coordenadas/puntos de las casillas vecinas
+            vector<Punto> vecinosLibres;           
+            
+             // Bucle que recorre las direcciones de movimiento (⬆️ ⬅️ ⬇️ ➡️)
+            for (const Punto& dir : direcciones) { //  No vamos a modificar dir (direccion), y solo lo tomaremos como referencia
+
+                int nx = actual.x + dir.x * 2;     // Se toma la posicion actuaal (fila y columna), se le suma el movimiento (dir)
+                int ny = actual.y + dir.y * 2;     // Y se le multiplica por 2 (para saltar una celdaa y crear un pasillo ancho)
+                
+                if (esValida(nx, ny) && !visitado[nx][ny]) {   // Verifica si la posicion es valida (no sale del laberinto) y si no ha sido visitada aun
+                    vecinosLibres.push_back(Punto(nx, ny));    // Agrega entonces esa coordenadas a vecinos libres, pero al final de la lista (Para explorarla despues)
+                }
+            }
+            
+
+            if (!vecinosLibres.empty()) { // Si hay vecinos libres para moverse entonces... (El "!" cambia el valor de la condicion al contrario)
+                                                            // .empy(si el contenedor esta vacio = True, sino False)
+                //------------------------------
+                // Elegir un vecino aleatorio
+                //------------------------------
+
+                // Generador de numeros aleatorios uniformes
+                uniform_int_distribution<int> dist(0, vecinosLibres.size() - 1); // "dist(0, vecinosLibres.size() - 1)" rango en el que va a tomar el numero
+                                                                                 // "vecinosLibres.size()" devuelve cuantos numeros hay guardados (se le resta uno por que vectores empieza en 0)
+
+                Punto siguiente = vecinosLibres[dist(generador)]; // Se guarda el vecino elegido al azar en la variable "siguente" que va a ser de tipo punto
+                
+                // Crear camino hacia el vecino elegido
+                int mx = actual.x + (siguiente.x - actual.x) / 2; // Se calcula la posicion (fila y columna) del punto intermedio del salto
+                int my = actual.y + (siguiente.y - actual.y) / 2; // Que esta entre la posicion actual y la siguente a la que vamos a saltar
+                
+                // Bloque que marca el caamino del laberinto
+                laberinto[mx][my] = ' ';                    // Habre el muro intermedio (Entre la posicion en donde estabamos y donde caemos)
+                laberinto[siguiente.x][siguiente.y] = ' ';  // Habre la posicion donde caemos
+                visitado[siguiente.x][siguiente.y] = true;  // Marca la celda como visitada
+                
+                pila.push(siguiente); // Guarda el camino (punto/coordenada) en una pila
+
+            } else { // Sino
+                // No hay vecinos libres, retroceder
+                pila.pop(); // Con este retrocedemos a una posicion anterior para buscar vecinos no explorados
+            }
+        }
+        
+        // Asegurar que entrada y salida sean caminos libres
+        laberinto[entrada.x][entrada.y] = 'E'; // Coloco el simbolo de entrad "E" en la coordenada/punto de la entrada
+        laberinto[salida.x][salida.y] = 'S';   // Coloco el simbolo de la salida "S" en la coordenada/punto de la salida
+        
+        cout << "OK Laberinto generado exitosamente!" << endl; // Mensaje
     }
     
 
