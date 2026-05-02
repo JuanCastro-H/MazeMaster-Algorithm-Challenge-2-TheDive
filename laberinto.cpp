@@ -3,9 +3,12 @@
 
 // "#include" sirve para llamar librerias (Que son cajas de herramientas)
 #include <iostream>   // Se encarga de la comunicacion con el usuario (Flujo de entrada y salida)
-
-
+#include <vector>     // Sirve para crear contenedores dinamicos, permitiendo que su tamanho sea modificado durante la ejecucion del programa
 // Le dice al programa cada vez que pida un martillo de la caja roja, no me hagas decir CajaRoja::Marillo. solo di martillo y me entiendes
+#include <chrono>     // Es Como un cronometro digital que puede medir el tiempo de manera ultra precisa milisegundos o menos
+#include <random>     // Es como una dado electronico, que sirve para obtener numeros aleatorios
+
+
 using namespace std; // Ahorra codigo y hace mas comodo la sintaxis en proyectos pequenhos
 
 
@@ -79,6 +82,72 @@ struct Punto { // Crea un molde para definir las posiciones con sus coordenadas 
     // * "&" Significa no copio el objeto solo lo apunto (Es mas eficiente)
     // * "const" (al final) se asegura de que no se modifique el punto original
 };
+
+
+
+
+// CREACION VISUALIZACION Y RESOLUCION DEL LABERINTO
+
+
+class LaberintoMaestro { /*Este bloque define la clase LaberintoMaestro,
+que es como un “molde/receta” con los datos que tiene el laberinto y qué puede hacer.*/
+
+//----------------------------------------------------------------
+// ATRIBUTOS PRIVADOS (Datos internos del laberinto)
+//----------------------------------------------------------------
+
+private:
+    vector<vector<char>> laberinto; // Matriz que representa el mapa (Cada casilla puede ser un carácter "char")
+//     ↑       ↑
+//     |       └─ Cada fila es un vector de caracteres.
+//     └─────────── El laberinto es un vector de filas.
+
+
+    //--- Bloque de atributos privados de la clase  ---//
+
+    int filas, columnas;    // Tamanho del laberinto.
+    Punto entrada, salida;  // Coordenadas de Inicio/Fin.
+    vector<Punto> solucion; // Lista de puntos que que guardan el camino desde la entrada a la salida.
+    // Dados virtuales:
+    mt19937 generador;      // Generador de numeros aleatorios (dados) ( Mersenne Twister)
+    
+    // Direcciones para moverse (arriba, derecha, abajo, izquierda)
+    const vector<Punto> direcciones = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+    //    | "Dame una caja donde pued guardar muchas coordenadas"
+
+//----------------------------------------------------------------
+// CONSTRUCTOR
+//----------------------------------------------------------------
+
+public:
+    // Constructor  |Parametros    | Inicializamos directamente las variables de filas y columnas (El +2 es para compensar las capaz de muro)
+    LaberintoMaestro(int f, int c) : filas(f + 2), columnas(c + 2) {
+
+        //---------------------------------------------------
+        // Inicializar generador de numero aleatorio con tiempo actual
+        //---------------------------------------------------
+//    |Dados . semilla|
+        generador.seed(chrono::steady_clock::now().time_since_epoch().count()); 
+            //  DATOS: * Libreria de tiempo
+             //        * Reloj interno del pc
+             //        * Momento actual
+             //        * "epoch" es el punto de inicio de tiempo de las pc (generalmente 01/01/1970)
+            //         * Calcula cuanto tiempo ha pasado desde ese momento hasta ahora
+            //         * "count" convierte ese numero ramdons en entero
+
+        
+        
+        
+        // Rellena cada espacio del laberinto con "#"
+        laberinto = vector<vector<char>>(filas, vector<char>(columnas, '#'));
+                //  |Matriz<fila<lista.caracteres
+
+        // Definir entrada y salida (considerando los bordes)
+        entrada = Punto(1, 1);
+        salida = Punto(filas - 2, columnas - 2);
+    }
+    
+
 
 
 
