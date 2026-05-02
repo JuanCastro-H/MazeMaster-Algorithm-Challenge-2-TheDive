@@ -313,6 +313,67 @@ public:
     
 
 
+    //----------------------------------------------------------------
+    // Mostrar el laberinto en consola
+    //----------------------------------------------------------------
+
+    void mostrarLaberinto(bool mostrarSolucion = false) const { // Funcion//accion que muestra el laberinto
+                        // Si este paremetro es cierto = se muestra la solucion del laberinto
+
+        // Imprime el tamanho del laberinto y el numero real de filas y columnas jugables
+        cout << "\n>> Laberinto (" << (filas-2) << "x" << (columnas-2) << "):" << endl;
+        cout << "E = Entrada, S = Salida, # = Muro, . = Camino libre";
+        
+
+        //----------------------------------------------------------------
+        // BLOQUE QUE MUESTRA LA SOLUCUION DEL LABERINTO
+        //---------------------------------------------------------------- 
+
+        if (mostrarSolucion && !solucion.empty()) { // Si se pide mostrar la solucion y ya existe ese camino... (Guardado en la variable solicion)
+            cout << ", X = Solucion";
+        }
+        cout << "\n" << endl;
+        
+        // Crear copia del laberinto para mostrar
+        vector<vector<char>> display = laberinto; // La guarda en la variable display
+                                                    // (Para poder modificarla agregandole la solucion sin cambiar el original)
+        
+        // Marcar la solucion si se solicita
+        if (mostrarSolucion && !solucion.empty()) { // Si se pide mostrar la solucion y ya existe ese camino...
+            for (const Punto& p : solucion) { // Recorre cada Coordenada de soluciones guardandola en p temporalmente
+
+                if (display[p.x][p.y] == ' ') { // Verifica si en la copia edel laberinto (display) la celda de esa coordenada esta vacia (" ")
+                                                // Esto evita sobreescribir muros o entradas/salidas
+                    display[p.x][p.y] = 'X';    // Cambia ese espcio vacio (" ") por una X
+                }
+            }
+        }
+        
+        // Mostrar el laberinto con bordes
+        // DATOS: * i (representa el indice de la fial actual)
+        //        * j (Representa el indice de la columna actual)
+
+        for (int i = 0; i < filas; i++) { // Recorre todas las filas del laberinto desde 0 hasta filas-1.
+            // Datos: * se inicializa i = 0
+            //        * i++ aumenta i en 1
+            //        * Y el bucle continuara mientras i no iguale o supere el numero real de filas
+
+            for (int j = 0; j < columnas; j++) { // Recorre todas las columnsa de izquierda a derecha para cada fila
+                char cell = display[i][j];       // Se guardaa el valor de la celda actual en la copia del laberinto (dispaly)
+                                                 // Ej: Si display[i][j] es ' ', cell será '.'.
+
+                // Convertir espacios vacios a punto para mejor visualizacion
+                if (cell == ' ') cell = '.'; // No cambia ningun otro caracter #,E,S,X 
+                
+                cout << cell << " "; // Muestra el caracter en la consola
+            }
+            cout << endl; // Agrega un espacio
+        }
+        cout << endl; // Salto de linea al final de cada fila 
+    }
+    
+
+
 
 
 //----------------------------------------------------------------
