@@ -8,7 +8,8 @@
 #include <chrono>     // Es Como un cronometro digital que puede medir el tiempo de manera ultra precisa milisegundos o menos
 #include <random>     // Es como una dado electronico, que sirve para obtener numeros aleatorios
 #include <stack>      // Acomoda los datos en una pila (tipo de platos) donde el ultimo en entrar es el primero en salir
-
+#include <queue>      // Ordena los datos en una cola (tipo de espera) Donde el primero en llegar es el primero en salir
+#include <algorithm>  // Sirve para llamar o traer funcionen ya echas (Ayuda a no reinventar la rueda y reducir codigo)
 
 using namespace std; // Ahorra codigo y hace mas comodo la sintaxis en proyectos pequenhos
 
@@ -239,6 +240,75 @@ public:
         laberinto[salida.x][salida.y] = 'S';   // Coloco el simbolo de la salida "S" en la coordenada/punto de la salida
         
         cout << "OK Laberinto generado exitosamente!" << endl; // Mensaje
+    }
+
+
+
+    //----------------------------------------------------------------
+    // Resolver laberinto usando BFS (Busqueda en Anchura)
+    //----------------------------------------------------------------
+    bool resolverLaberinto() {
+        cout << ">> Resolviendo laberinto..." << endl;
+        
+        queue<Punto> cola; // Aca se guardan las posiciones del laberinto que faltan por explorar en un formato de cola (supermercado)
+
+        vector<vector<bool>> visitado(filas, vector<bool>(columnas, false)); // Sirve para verificar si ya pasamos por una coordenada/punto asignandole True o False
+        vector<vector<Punto>> padre(filas, vector<Punto>(columnas, Punto(-1, -1))); // Guarda un objeto Punto (coordenada) que representa de dónde venimos
+                                                        // Inicialmente todas las posiciones están en (-1, -1) eso indica “sin padre”
+        
+        cola.push(entrada); // Ponemos que el primer numero a visitar sea la coordenada de la entrada
+        visitado[entrada.x][entrada.y] = true; // Y marcamos la entrada como visitada
+        
+        // Este bucle seguira explornado siempre que aun hayan datos guardados en la cola hasta acabarlos
+        while (!cola.empty()) {
+            Punto actual = cola.front(); // Saca el primer elemento que entro a la cola y aun no salio
+            cola.pop(); // Y luego lo elimina (para que quede el siguente como el primero)
+            
+            // Llegamos a la salida?...
+            if (actual == salida) { 
+
+                // Reconstruir el camino
+                solucion.clear(); // Se asegura de borrar cualquier contenido previo que pudiera quedar en solucion
+                Punto temp = salida; // Crea una variable de coordenas y mete las coordenadas del camino hacia la salida
+                // analogia: Es como empezar desde el final siguendo las migas de pan que dejaste
+                // Dato: (temp-temporal) por que se va a usar de manera temporal para el calculo
+
+                while (!(temp.x == -1 && temp.y == -1)) { // Va a repetir el bucle mientras la variable temp, no sea valor (-1, -1) (Que significa que ya no hay padre)
+                    solucion.push_back(temp);      // Mete el punto/coordenad actual la variable solucion (.push_back(temp) = gregar un elemento al final del vector (temp).)
+                    temp = padre[temp.x][temp.y];  // Nos da la celda anterior al punto donde estamos (padre es una matriz de puntos, temp es un punto de esa mtiz)
+                        // Ej: Si llegamos a la celda (3,5) desde (2,5), entonces padre[3][5] = (2,5).
+                }
+                
+                // Invertir para tener el camino desde entrada hasta salida
+                reverse(solucion.begin(), solucion.end()); // Ivertimos el orden de los datos de la variable solucion para que vaya de la entrada a la salida (Por que la construimos alrevez)
+                                                            // "solucion.begin()"" es el inicio del vector
+                                                            // "solucion.end()"" es el final 
+
+                cout << "EXITO! Laberinto resuelto! Camino encontrado." << endl;
+                return true; // Indicamos que la funcion tuvo exito
+            }
+            
+            // Explorar vecinos
+            for (const Punto& dir : direcciones) { // Vamos a recorrer cada direcion a la que nos podemos mover en la selda actual
+                
+                // Caalculamos las coordenadas del vecino
+                int nx = actual.x + dir.x;  // sumando respectivamente la fila y columna actual mas
+                int ny = actual.y + dir.y;  // la fila y columna del proximo movimiento
+                
+                // VERIFICAMOS SI LA CELDA VECINA ES VALIDA (Si no esta fuera del laberinto, aun no la visitamos, y es un camino libro o la salida)
+                if (esValida(nx, ny) && !visitado[nx][ny] && 
+                    (laberinto[nx][ny] == ' ' || laberinto[nx][ny] == 'S')) { // Entonces...
+                    
+                    visitado[nx][ny] = true;  // La marcamos como visitadaa
+                    padre[nx][ny] = actual;   // Guardmos de donde vinimos para reconstruir el camino luego
+                    cola.push(Punto(nx, ny)); // Mete la selda vacia/valida a la cola del BFS para analiarla mas tarde
+                }
+            }
+        }
+        
+        // SI EL LABERINTO LLEGA A NO TENER SOLUCION
+        cout << "ERROR: No se encontro solucion al laberinto." << endl;
+        return false;
     }
     
 
