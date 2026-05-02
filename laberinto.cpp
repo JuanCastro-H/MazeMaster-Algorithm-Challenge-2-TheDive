@@ -464,5 +464,44 @@ int main(int argc, char* argv[]) {
 
     // Mensaje
     cout << ">> Creando laberinto de " << filas << "x" << columnas << "..." << endl;
+
+    //-- Crear el laberinto --//
+    LaberintoMaestro laberinto(filas, columnas); // se crea un objeto de la clase LaberintoMaestro (osea un laberinto)
+    
+    //-- Medir tiempo de generacion --//
+    double tiempoGeneracion = laberinto.medirTiempo([&laberinto]() { // Medimos el tiempo de generacion del laberinto (con la funcion/accion .medirTiempo)
+        laberinto.generarLaberinto();                                // Despues generamos e laberinto usando backtracking (llamando a la funcion/accion .generarLaberinto)
+    });                                                              // Guardamos ese dato en la variable tiempoGeneracion 
+    
+
+    //-- Mostrar laberinto sin solucion --//
+    laberinto.mostrarLaberinto(); // Mostramos el laberinto sin indicarle que nos pase la solucion
+    
+    //-- Medir tiempo de resolucion --//
+    bool resuelto = false; // Para que devuelva la solucion
+    double tiempoResolucion = laberinto.medirTiempo([&laberinto, &resuelto]() { // Medimos el tiempo de mostrar el laberinto sin solucion  y o guardamos en tiempoSolucion
+        resuelto = laberinto.resolverLaberinto();                               // Buscamos la ruta de salida usando BFS
+    });
+    
+    if (resuelto) { // Si encuentra la solucion
+
+        //-- Mostrar laberinto con solucion --//
+        cout << ">> Laberinto con la solucion marcada:" << endl; // Mensaje
+        laberinto.mostrarLaberinto(true); // Muestra el laberinto con la ruta marcada con X
+    }
+    
+    //-- Mostrar estadisticas --//
+    laberinto.mostrarEstadisticas(); // Llamamos a la funcion/accion de mostrar estadisticas 
+    
+    //-- Mostrar tiempos de ejecucion --//
+    cout << ">> Tiempos de Ejecucion:" << endl;
+    cout << "   Generacion: " << tiempoGeneracion << " ms" << endl;
+    cout << "   Resolucion: " << tiempoResolucion << " ms" << endl;
+    cout << "   Total: " << (tiempoGeneracion + tiempoResolucion) << " ms" << endl;
+    
+    cout << "\n Mision completada El codigo tiene salida... y la encontraste." << endl; // Mensaje final
+    
     return 0; // LE dice a c++ que todo salio bien y el programa termino su ejecucion
 }
+
+
