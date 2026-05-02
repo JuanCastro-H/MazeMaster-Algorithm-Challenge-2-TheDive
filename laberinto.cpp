@@ -5,7 +5,11 @@
 #include <iostream>   // Se encarga de la comunicacion con el usuario (Flujo de entrada y salida)
 
 
-using namespace std;
+// Le dice al programa cada vez que pida un martillo de la caja roja, no me hagas decir CajaRoja::Marillo. solo di martillo y me entiendes
+using namespace std; // Ahorra codigo y hace mas comodo la sintaxis en proyectos pequenhos
+
+
+
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 // Funcion para leer tamano desde parametros o entrada del usuario
@@ -47,6 +51,35 @@ pair<int, int> obtenerTamano(int argc, char* argv[]) {
     
     return make_pair(filas, columnas); // Devuelve un par de enteros (x,y) con los calores de las filas y columnas
 }                                      // make_pair es como una cajita de 2 compartimientos, se puede entregar completa y s=luego leer ambos valores            
+
+
+
+
+// Estructura para representar una coordenada (fila, columna)
+
+struct Punto { // Crea un molde para definir las posiciones con sus coordenadas en el laberinto (X ; Y)
+
+    //(fila , columna)
+    int  x, y;
+    // Receta para crear un punto/coordenada del mapa
+    Punto(int x = 0, int y = 0)  :  x(x), y(y) {} // (CONSTRUCTOR)
+    // Sino se dan valores el      | Asigna los valores de X e Y a sus variables correspondientes(antes de meterlas en el mapa)
+    // punto/coordenada sera (0,0)
+    
+    //----------------------------------------------------------------
+    // Condicional que comparada si 2 puntos o coordenadas son iguales
+    //----------------------------------------------------------------
+    //(Son iguales cuando sus coordenadas x e y son idénticas)
+    bool operator==(const Punto& otro) const {
+        return x == otro.x && y == otro.y; // Aca se compara la coordenada "X" e "Y" con las de otro punto.
+    }       
+
+    // Dato importante: "(const Punto& otro) const" 
+    // * "(const Punto& otro)" Va a recibir otro objeto como referencia
+    // * "&" Significa no copio el objeto solo lo apunto (Es mas eficiente)
+    // * "const" (al final) se asegura de que no se modifique el punto original
+};
+
 
 
 //----------------------------------------------------------------
